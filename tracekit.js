@@ -273,6 +273,7 @@ TraceKit.computeStackTrace = (function computerStackTraceWrapper() {
         try {
             if (XMLHttpRequest === undefined) { // IE 5.x-6.x:
                 XMLHttpRequest = function IEXMLHttpRequestSub() {
+            if (typeof (XMLHttpRequest) === 'undefined') { // IE 5.x-6.x:
                     try {
                         return new ActiveXObject('Msxml2.XMLHTTP.6.0');
                     } catch (e) {}
@@ -946,7 +947,7 @@ TraceKit.computeStackTrace = (function computerStackTraceWrapper() {
      */
     function computeStackTrace(ex, depth) {
         var stack = null;
-        depth = (depth === undefined ? 0 : +depth);
+        depth = (depth == null ? 0 : +depth);
 
         try {
             // This must be tried first because Opera 10 *destroys*
@@ -1006,7 +1007,7 @@ TraceKit.computeStackTrace = (function computerStackTraceWrapper() {
      * @return {Object.<string, *>} Stack trace information.
      */
     function computeStackTraceOfCaller(depth) {
-        depth = (depth === undefined ? 0 : +depth) + 1; // "+ 1" because "ofCaller" should drop one frame
+        depth = (depth == null ? 0 : +depth) + 1; // "+ 1" because "ofCaller" should drop one frame
         try {
             (0)();
         } catch (ex) {
