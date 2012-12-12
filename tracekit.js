@@ -14,7 +14,7 @@ var TraceKit = {};
  * @param {Object} host object to check property
  * @param {string} key to check
  */
-TraceKit._has: function _has(object, key) {
+TraceKit._has = function _has(object, key) {
     return Object.prototype.hasOwnProperty.call(object, key);
 };
 
@@ -271,9 +271,10 @@ TraceKit.computeStackTrace = (function computerStackTraceWrapper() {
             return '';
         }
         try {
-            if (XMLHttpRequest === undefined) { // IE 5.x-6.x:
-                XMLHttpRequest = function IEXMLHttpRequestSub() {
+            var XMLHttpRequestWrapper;
+
             if (typeof (XMLHttpRequest) === 'undefined') { // IE 5.x-6.x:
+                XMLHttpRequestWrapper = function IEXMLHttpRequestSub() {
                     try {
                         return new ActiveXObject('Msxml2.XMLHTTP.6.0');
                     } catch (e) {}
@@ -288,9 +289,11 @@ TraceKit.computeStackTrace = (function computerStackTraceWrapper() {
                     } catch (e) {}
                     throw new Error('No XHR.');
                 };
+            } else {
+                XMLHttpRequestWrapper = XMLHttpRequest;
             }
     
-            var request = new XMLHttpRequest();
+            var request = new XMLHttpRequestWrapper();
             request.open('GET', url, false);
             request.send('');
             return request.responseText;
@@ -493,7 +496,7 @@ TraceKit.computeStackTrace = (function computerStackTraceWrapper() {
             var name = parts[1] ? '\\s+' + parts[1] : '',
                 args = parts[2].split(',').join('\\s*,\\s*');
 
-            body = escapeRegExp(parts[3]).replace(/;$/, ';?') // semicolon is inserted if the function ends with a comment.replace(/\s+/g, '\\s+');
+            body = escapeRegExp(parts[3]).replace(/;$/, ';?'); // semicolon is inserted if the function ends with a comment.replace(/\s+/g, '\\s+');
             re = new RegExp('function' + name + '\\s*\\(\\s*' + args + '\\s*\\)\\s*{\\s*' + body + '\\s*}');
         }
 
@@ -874,15 +877,7 @@ TraceKit.computeStackTrace = (function computerStackTraceWrapper() {
             item,
             source;
 
-        //from: https://github.com/h5bp/html5-boilerplate/blob/d242bd27cdfaafb7d36c0e1908d7c60bde1e8b67/js/plugins.js
-        if (!arguments.callee) {
-          try {
-            arguments.callee = computeStackTraceByWalkingCallerChain.caller;
-          } catch (e) {
-            
-          }
-        }
-        for (var curr = arguments.callee.caller; curr && !recursion; curr = curr.caller) {
+        for (var curr = computeStackTraceByWalkingCallerChain.caller; curr && !recursion; curr = curr.caller) {
             if (curr === computeStackTrace || curr === TraceKit.report) {
                 // console.log('skipping internal function');
                 continue;
@@ -1009,7 +1004,7 @@ TraceKit.computeStackTrace = (function computerStackTraceWrapper() {
     function computeStackTraceOfCaller(depth) {
         depth = (depth == null ? 0 : +depth) + 1; // "+ 1" because "ofCaller" should drop one frame
         try {
-            (0)();
+            throw new Error();
         } catch (ex) {
             return computeStackTrace(ex, depth + 1);
         }
