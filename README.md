@@ -75,7 +75,7 @@ var bar = function barFn() { //'Fn' is to avoid errors in IE
 };
 ```
 
-We recommend the above convention of function naming, `ApiFoo` always corresponds to `API.foo`, `barFn` corresponds to `bar` - if they function name is the same as the identifier, you can have bugs in IE.
+We recommend the above convention of function naming, `ApiFoo` always corresponds to `API.foo`, `barFn` corresponds to `bar` - just as long as the function name is not the same as the identifier. Otherwise, you can have bugs in IE.
 
 ## Options
 
