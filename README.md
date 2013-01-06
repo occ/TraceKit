@@ -95,18 +95,6 @@ View the source for more details and examples.
 
 ![Stacktrace or GTFO](http://i.imgur.com/jacoj.jpg)
 
-#### Saving a little memory (advanced function naming)
-
-If you understand all the semantics of function hoisting, where you can and cannot use function declarations, want to save a little bit of memory, and feel cool in general, you can use function declarations instead of function expressions:
-
-```javascript
-Api.foo = ApiFoo;
-function ApiFoo() {
-}
-```
-
-To learn all about function hoisting and function expressions, [read this](http://kangax.github.com/nfe/).
-
 ## Contributing
 
 All code must pass JSHint and tests, run `grunt` for this. New features also need documentation added to the README. Changes to existing api's need updated documentation too.
