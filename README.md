@@ -50,7 +50,10 @@ Then, make sure all your code is in a try/catch block:
 Put all your application code in a try/catch block:
 ```javascript
 try {
-  //your application code here
+  /*
+   * your application code here
+   *
+   */
   throw new Error('oops');
 } catch (e) {
   TraceKit.report(e); //error with stack trace gets normalized and sent to subscriber
