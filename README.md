@@ -42,7 +42,7 @@ In theory, TraceKit should work on all of the following versions:
 First, register a subscriber for error reports:
 ```javascript
 TraceKit.report.subscribe(function yourLogger(errorReport) {
-  //send via ajax to server, or use console.log in development
+  //send via ajax to server, or use console.error in development
 });
 ```
 
