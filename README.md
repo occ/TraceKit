@@ -97,7 +97,7 @@ View the source for more details and examples.
 
 ## Contributing
 
-All code must pass JSHint and tests, run `grunt` for this. New features also need documentation added to the README. Changes to existing api's need updated documentation too.
+All code must pass JSHint and tests, run `grunt` for this. New features need accompanying documentation README, changes to existing api's need updated documentation.
 
 ## License
 
