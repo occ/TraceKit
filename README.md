@@ -47,7 +47,6 @@ TraceKit.report.subscribe(function yourLogger(errorReport) {
 ```
 
 Then, make sure all your code is in a try/catch block:
-Put all your application code in a try/catch block:
 ```javascript
 try {
   /*
