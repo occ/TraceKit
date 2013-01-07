@@ -1,10 +1,10 @@
-/**! @preserve
- * Original CrashKit code Copyright (c) 2009 Andrey Tarantsov, YourSway LLC (http://crashkitapp.appspot.com/)
- * Copyright (c) 2010 Colin Snover (http://zetafleet.com)
- *
- * Released under the ISC License.
- * http://opensource.org/licenses/isc-license.txt
- */
+/**package {
+  "name": "TraceKit",
+  "description":"Cross browser stack traces."
+  "version": "2.8",
+  "license": "MIT",
+  "site": "https://github.com/occ/TraceKit"
+} **/
 var TraceKit = {};
 
 /**
