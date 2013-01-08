@@ -1,41 +1,22 @@
-TraceKit
-========
+TraceKit - Cross browser stack traces.
+=====================================
 
 [![Build Status](https://travis-ci.org/occ/TraceKit.png?branch=master)](https://travis-ci.org/occ/TraceKit)
 
-### Tracekit is a JavaScript library that automatically normalizes and exposes stack traces for unhandled exceptions across the 5 major browsers: IE, Firefox, Chrome, Safari, and Opera. ###
+## Supports All major browsers, from IE6 to Opera, the Andriod webiew and everywhere in between.
 
-Based on the hard work of [Andrey Tarantsov](http://www.tarantsov.com/).
+Not all browsers support stack traces on error objects, but TraceKit squeezes out as much useful information as possible and normalizes it.
 
-TraceKit:
+3kB minified + gzipped.
 
-* leverages native browser support for retrieving stack traces from Error objects where available, and squeezes out as much useful information as possible from browsers that don’t. 
-* integrates neatly with **jQuery**, automatically wrapping all of your event handlers and AJAX callbacks so that you get the most useful stack information possible.
-* attempts to extend support for column-level granularity of the top-most frame to all browsers, in order to allow you to debug even minified JavaScript. This does not work perfectly, and won’t until all browser manufacturers are exposing good stack trace information, but it ought to be more useful than nothing.
 
-Just 8kB minified and 3kB minified + gzipped.
+## Install
 
-The best software is software that doesn’t generate any unhandled exceptions; I hope TraceKit helps you achieve that goal.
+```
+bower install tracekit
+```
+This places TraceKit at `components/tracekit/tracekit.js`
 
-*-Colin Snover*
-
-Tracekit supports:
-
-* Firefox:         full stack trace with line numbers, plus column number on top frame; column number is not guaranteed
-* Opera:           full stack trace with line and column numbers
-* Chrome:          full stack trace with line and column numbers
-* Safari:          line and column number for the top frame only; some frames  may be missing, and column number is not guaranteed
-* IE:              line and column number for the top frame only; some frames may be missing, and column number is not guaranteed
-* Android webview: full stack trace with line and column numbers
-
-In theory, TraceKit should work on all of the following versions:
-
-* IE5.5+ (only 8.0 tested)
-* Firefox 0.9+ (only 3.5+ tested)
-* Opera 7+ (only 10.50 tested; versions 9 and earlier may require `Exceptions Have Stacktrace` to be enabled in opera:config)
-* Safari 3+ (only 4+ tested)
-* Chrome 1+ (only 5+ tested)
-* Android 2.1+ webview (only 2.3+ tested)
 
 ## Usage
 

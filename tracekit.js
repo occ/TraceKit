@@ -1,10 +1,7 @@
-/**package {
-  "name": "TraceKit",
-  "description":"Cross browser stack traces."
-  "version": "2.8",
-  "license": "MIT",
-  "site": "https://github.com/occ/TraceKit"
-} **/
+/*
+ TraceKit - Cross brower stack traces - github.com/occ/TraceKit
+ MIT license
+*/
 var TraceKit = {};
 
 /**
