@@ -17,7 +17,7 @@ bower install tracekit
 ```
 This places TraceKit at `components/tracekit/tracekit.js`. Install [bower](http://twitter.github.com/bower/): `npm install bower -g`, download npm with Node: http://nodejs.org
 
-Then add the script to your page
+Then include the `<script>` to your page
 
 ## Usage
 
