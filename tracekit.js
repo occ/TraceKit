@@ -1058,7 +1058,8 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
  * Extends support for global error handling for asynchronous browser
  * functions. Adopted from Closure Library's errorhandler.js
  */
-(function extendToAsynchronousCallbacks() {
+TraceKit.wrapAsyncCallbacks = function  ()
+{
     var _helper = function _helper(fnName) {
         var originalFn = window[fnName];
         window[fnName] = function traceKitAsyncExtension() {
@@ -1081,13 +1082,15 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
 
     _helper('setTimeout');
     _helper('setInterval');
-}());
+};
 
 /**
  * Extended support for backtraces and global error handling for most
  * asynchronous jQuery functions.
  */
-(function traceKitAsyncForjQuery($) {
+TraceKit.wrapJQuery = function ()
+{
+    var $ = window.jQuery;
 
     // quit if jQuery isn't on the page
     if (!$) {
@@ -1152,8 +1155,7 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
             throw e;
         }
     };
-
-}(window.jQuery));
+};
 
 //Default options:
 if (!TraceKit.remoteFetching) {
