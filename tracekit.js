@@ -180,11 +180,15 @@ TraceKit.report = (function reportModuleWrapper() {
             };
         }
 
-        notifyHandlers(stack, 'from window.onerror');
-
-        if (_oldOnerrorHandler) {
-            return _oldOnerrorHandler.apply(this, arguments);
+        function notifyHandlersWrapper() {
+            notifyHandlers(stack, 'from window.onerror');
         }
+        if (_oldOnerrorHandler) {
+            var args = Array.prototype.slice.call(arguments);
+            args.push(notifyHandlersWrapper);
+            return _oldOnerrorHandler.apply(this, args);
+        }
+        notifyHandlersWrapper();
 
         return false;
     }
