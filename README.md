@@ -74,7 +74,7 @@ TraceKit.collectWindowErrors = false;
 
 ### Existing `window.onerror` function?
 
-TraceKit installs it's own window.onerror function, but your will still get called normally.
+TraceKit installs it's own window.onerror function, but yours will still get called normally.
 If you don't want TraceKit to notify subscribers, then `return {notifyHandlers: false};` from your window.onerror function.
 
 View the source for more details and examples.
