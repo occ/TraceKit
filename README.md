@@ -72,6 +72,11 @@ You can also tell TraceKit to ignore global window errors with:
 TraceKit.collectWindowErrors = false;
 ```
 
+### Existing `window.onerror` function?
+
+TraceKit installs it's own window.onerror function, but your will still get called normally.
+If you don't want TraceKit to notify subscribers, then `return {notifyHandlers: false};` from your window.onerror function.
+
 View the source for more details and examples.
 
 ![Stacktrace or GTFO](http://i.imgur.com/jacoj.jpg)
