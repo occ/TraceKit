@@ -322,7 +322,7 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
             return '';
         }
         try {
-            function getXHR() {
+            getXHR = function() {
                 try {
                     return new window.XMLHttpRequest();
                 } catch (e) {
