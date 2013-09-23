@@ -89,6 +89,19 @@ Error object along. In this case, TraceKit has the function `TraceKit.supportsEx
 with a boolean. If true, `window.onerror` has superpowers and wrapping plugins should halt as their functionality
 is no longer needed.
 
+## Building
+
+To get minified versions of source, clone the project, and:
+
+```bash
+npm install
+wget http://closure-compiler.googlecode.com/files/compiler-latest.zip
+unzip compiler-latest.zip -d closure
+grunt
+```
+
+Built files will be stored in /dist.
+
 `tracekit.noplugins.min.js` does not wrap setTimeout/setInterval or jQuery. 
 
 `tracekit.min.js` contains setTimeout/setInterval & jQuery wrapping. If you need one but not the other,
