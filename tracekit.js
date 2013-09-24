@@ -75,7 +75,7 @@ TraceKit.supportsExtendedWindowOnError = function supportsExtendedWindowOnError(
     }
 
     var oldOnError = window.onerror;
-    window.onerror = function(message, filename, lineno, colno, error) {
+    var testOnError = function(message, filename, lineno, colno, error) {
         // Return window.onerror to its rightful owner.
         window.onerror = oldOnError;
         // Cache this result.
@@ -87,9 +87,19 @@ TraceKit.supportsExtendedWindowOnError = function supportsExtendedWindowOnError(
         return true;
     };
 
-    // Throw an error so we can detect window.onerror's arity
+    window.onerror = testOnError;
+
+    // Throw an error so we can detect window.onerror's arity.
+    // Do this within a setTimeout so we don't stop execution of whatever called this.
     setTimeout(function() {
-        throw new Error('Testing Error');
+        // Only execute this test if our overridden onerror still stands.
+        // If not, somebody has switched it out from under us & we can't test this properly.
+        if (window.onerror === testOnError){
+            throw new Error('Testing Error');
+        } else {
+            _supportsExtendedOnError = false;
+            cb(_supportsExtendedOnError);
+        }
     });
 };
 
