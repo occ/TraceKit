@@ -3,6 +3,12 @@
  * functions. Adopted from Closure Library's errorhandler.js
  */
 (function extendToAsynchronousCallbacks(window) {
+
+    // Bail out if window.onerror can do this for us.
+    if (window.TraceKit.supportsExtendedWindowOnError()) {
+        return;
+    }
+
     var _helper = function _helper(fnName) {
         var originalFn = window[fnName];
         window[fnName] = function traceKitAsyncExtension() {
@@ -23,15 +29,6 @@
         };
     };
 
-    window.TraceKit.supportsExtendedWindowOnError(function(supported){
-        if(!supported) {
-            installHelpers();
-        }
-    });
-
-    function installHelpers() {
-        _helper('setTimeout');
-        _helper('setInterval');
-    }
-
+    _helper('setTimeout');
+    _helper('setInterval');
 }(this));

@@ -8,7 +8,6 @@
 
 var TraceKit = {};
 var _oldTraceKit = window.TraceKit;
-var _supportsExtendedOnError;
 
 // global reference to slice
 var _slice = [].slice;
@@ -59,48 +58,29 @@ TraceKit.wrap = function traceKitWrapper(func) {
 };
 
 /**
- * TraceKit.supportsExtendedWindowOnError: Calls back with a boolean indicating
+ * TraceKit.supportsExtendedWindowOnError: Returns a boolean indicating
  * support for the extended window.onerror handler, part of the HTML5 spec as of 
  * August 2013. (https://mikewest.org/2013/08/debugging-runtime-errors-with-window-onerror)
  *
  * Call this function from a plugin to determine if you should wrap a function or not.
  * If the browser supports extended window.onerror, there is no need to wrap jQuery,
  * setTimeout, etc. as they will receive decent stacks from window.onerror itself.
+ *
+ * An easy way to test for support is to check for an error & colno attribute
+ * on a created ErrorEvent. See 
+ * https://src.chromium.org/viewvc/blink/trunk/LayoutTests/fast/events/constructors/error-event-constructor.html?r1=155454&r2=155453&pathrev=155454
  * 
- * @param  {Function} cb Callback with support enabled/disabled boolean.
+ * @returns {Boolean} supportedExtendedOnError Support enabled/disabled boolean.
  */
-TraceKit.supportsExtendedWindowOnError = function supportsExtendedWindowOnError(cb) {
-    if (typeof _supportsExtendedOnError !== 'undefined') {
-        return cb(_supportsExtendedOnError);
-    }
+TraceKit.supportsExtendedWindowOnError = function supportsExtendedWindowOnError() {
+    if (!window.ErrorEvent) return false;
+    
+    var testError = new window.ErrorEvent('eventType', {error: {foo: 12345}});
 
-    var oldOnError = window.onerror;
-    var testOnError = function(message, filename, lineno, colno, error) {
-        // Return window.onerror to its rightful owner.
-        window.onerror = oldOnError;
-        // Cache this result.
-        _supportsExtendedOnError = (typeof colno !== 'undefined' && typeof error !== 'undefined');
-        // Call back with the result, but don't do it inside this window.onerror handler;
-        // otherwise, you may see weird results if you throw an error from whatever handles the callback.
-        setTimeout(function() { cb(_supportsExtendedOnError); }, 0);
-        // Prevent the error from hitting the console.
+    if (testError.error && testError.error.foo === 12345 && typeof testError.colno === 'number'){
         return true;
-    };
-
-    window.onerror = testOnError;
-
-    // Throw an error so we can detect window.onerror's arity.
-    // Do this within a setTimeout so we don't stop execution of whatever called this.
-    setTimeout(function() {
-        // Only execute this test if our overridden onerror still stands.
-        // If not, somebody has switched it out from under us & we can't test this properly.
-        if (window.onerror === testOnError){
-            throw new Error('Testing Error');
-        } else {
-            _supportsExtendedOnError = false;
-            cb(_supportsExtendedOnError);
-        }
-    });
+    }
+    return false;
 };
 
 /**
