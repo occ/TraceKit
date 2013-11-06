@@ -106,7 +106,9 @@ TraceKit.report = (function reportModuleWrapper() {
      * @param {Function} handler
      */
     function subscribe(handler) {
-        installGlobalHandler();
+        if (TraceKit.globalHandling) {
+          installGlobalHandler();
+        }
         handlers.push(handler);
     }
 
@@ -1092,19 +1094,11 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
     _helper('setInterval');
 }());
 
-//Default options:
-if (!TraceKit.remoteFetching) {
-  TraceKit.remoteFetching = true;
-}
-if (!TraceKit.collectWindowErrors) {
-  TraceKit.collectWindowErrors = true;
-}
-if (!TraceKit.linesOfContext || TraceKit.linesOfContext < 1) {
-  // 5 lines before, the offending line, 5 lines after
-  TraceKit.linesOfContext = 11;
-}
-
-
+// Default options:
+TraceKit.globalHandling = true;
+TraceKit.remoteFetching = true;
+TraceKit.collectWindowErrors = true;
+TraceKit.linesOfContext = 11;
 
 // Export to global object
 window.TraceKit = TraceKit;
