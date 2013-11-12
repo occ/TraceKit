@@ -206,7 +206,7 @@ TraceKit.report = (function reportModuleWrapper() {
         var args = _slice.call(arguments, 1);
         if (lastExceptionStack) {
             if (lastException === ex) {
-                throw ex; // already caught by an inner catch block, ignore
+                throw ex; // rethrow.
             } else {
                 var s = lastExceptionStack;
                 lastExceptionStack = null;
