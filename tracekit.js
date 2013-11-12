@@ -107,7 +107,7 @@ TraceKit.report = (function reportModuleWrapper() {
      */
     function subscribe(handler) {
         if (TraceKit.globalHandling) {
-          installGlobalHandler();
+              installGlobalHandler();
         }
         handlers.push(handler);
     }
@@ -128,11 +128,8 @@ TraceKit.report = (function reportModuleWrapper() {
      * Dispatch stack information to all handlers.
      * @param {Object.<string, *>} stack
      */
-    function notifyHandlers(stack, windowError) {
+    function notifyHandlers(stack) {
         var exception = null;
-        if (windowError && !TraceKit.collectWindowErrors) {
-          return;
-        }
         for (var i in handlers) {
             if (_has(handlers, i)) {
                 try {
@@ -182,7 +179,7 @@ TraceKit.report = (function reportModuleWrapper() {
             };
         }
 
-        notifyHandlers(stack, 'from window.onerror');
+        notifyHandlers(stack);
 
         if (_oldOnerrorHandler) {
             return _oldOnerrorHandler.apply(this, arguments);
@@ -209,7 +206,7 @@ TraceKit.report = (function reportModuleWrapper() {
         var args = _slice.call(arguments, 1);
         if (lastExceptionStack) {
             if (lastException === ex) {
-                return; // already caught by an inner catch block, ignore
+                throw ex; // already caught by an inner catch block, ignore
             } else {
                 var s = lastExceptionStack;
                 lastExceptionStack = null;
@@ -1094,10 +1091,9 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
     _helper('setInterval');
 }());
 
-// Default options:
+//Default options:
 TraceKit.globalHandling = true;
 TraceKit.remoteFetching = true;
-TraceKit.collectWindowErrors = true;
 TraceKit.linesOfContext = 11;
 
 // Export to global object
