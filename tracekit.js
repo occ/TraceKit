@@ -73,7 +73,9 @@ TraceKit.wrap = function traceKitWrapper(func) {
  * @returns {Boolean} supportedExtendedOnError Support enabled/disabled boolean.
  */
 TraceKit.supportsExtendedWindowOnError = function supportsExtendedWindowOnError() {
-    if (!window.ErrorEvent) return false;
+    if (!window.ErrorEvent){
+        return false;
+    }
     
     var testError = new window.ErrorEvent('eventType', {error: {foo: 12345}});
 
