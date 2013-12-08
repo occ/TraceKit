@@ -98,6 +98,7 @@ TraceKit.wrap = function traceKitWrapper(func) {
  */
 TraceKit.report = (function reportModuleWrapper() {
     var handlers = [],
+        lastArgs = null,
         lastException = null,
         lastExceptionStack = null;
 
@@ -126,9 +127,9 @@ TraceKit.report = (function reportModuleWrapper() {
      * Dispatch stack information to all handlers.
      * @param {Object.<string, *>} stack
      */
-    function notifyHandlers(stack, windowError) {
+    function notifyHandlers(stack, isWindowError) {
         var exception = null;
-        if (windowError && !TraceKit.collectWindowErrors) {
+        if (isWindowError && !TraceKit.collectWindowErrors) {
           return;
         }
         for (var i in handlers) {
@@ -161,9 +162,7 @@ TraceKit.report = (function reportModuleWrapper() {
 
         if (lastExceptionStack) {
             TraceKit.computeStackTrace.augmentStackTraceWithInitialElement(lastExceptionStack, url, lineNo, message);
-            stack = lastExceptionStack;
-            lastExceptionStack = null;
-            lastException = null;
+            processLastException();
         } else {
             var location = {
                 'url': url,
@@ -178,9 +177,8 @@ TraceKit.report = (function reportModuleWrapper() {
                 'stack': [location],
                 'useragent': navigator.userAgent
             };
+            notifyHandlers(stack, true);
         }
-
-        notifyHandlers(stack, 'from window.onerror');
 
         if (_oldOnerrorHandler) {
             return _oldOnerrorHandler.apply(this, arguments);
@@ -199,6 +197,15 @@ TraceKit.report = (function reportModuleWrapper() {
         _onErrorHandlerInstalled = true;
     }
 
+    function processLastException() {
+        var _lastExceptionStack = lastExceptionStack,
+            _lastArgs = lastArgs;
+        lastArgs = null;
+        lastExceptionStack = null;
+        lastException = null;
+        notifyHandlers.apply(null, [_lastExceptionStack, false].concat(_lastArgs));
+    }
+
     /**
      * Reports an unhandled Error to TraceKit.
      * @param {Error} ex
@@ -209,16 +216,14 @@ TraceKit.report = (function reportModuleWrapper() {
             if (lastException === ex) {
                 return; // already caught by an inner catch block, ignore
             } else {
-                var s = lastExceptionStack;
-                lastExceptionStack = null;
-                lastException = null;
-                notifyHandlers.apply(null, [s, null].concat(args));
+              processLastException();
             }
         }
 
         var stack = TraceKit.computeStackTrace(ex);
         lastExceptionStack = stack;
         lastException = ex;
+        lastArgs = args;
 
         // If the stack trace is incomplete, wait for 2 seconds for
         // slow slow IE to see if onerror occurs or not before reporting
@@ -226,9 +231,7 @@ TraceKit.report = (function reportModuleWrapper() {
         // stack trace
         window.setTimeout(function () {
             if (lastException === ex) {
-                lastExceptionStack = null;
-                lastException = null;
-                notifyHandlers.apply(null, [stack, null].concat(args));
+                processLastException();
             }
         }, (stack.incomplete ? 2000 : 0));
 
