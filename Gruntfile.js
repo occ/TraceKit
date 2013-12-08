@@ -61,12 +61,17 @@ module.exports = function (grunt) {
             lint: {
                 src: ['grunt.js', 'tracekit.js']
             }
+        },
+        mocha_phantomjs: {
+            tests: ['tests/tests.html']
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-closure-tools');
+    grunt.loadNpmTasks('grunt-mocha-phantomjs');
 
     grunt.registerTask('default', ['jshint:lint', 'closureCompiler:compile']);
     grunt.registerTask('travis', ['jshint:lint', 'closureCompiler:compile']);
+    grunt.registerTask('test', ['mocha_phantomjs']);
 };
