@@ -77,7 +77,13 @@ TraceKit.supportsExtendedWindowOnError = function supportsExtendedWindowOnError(
         return false;
     }
     
-    var testError = new window.ErrorEvent('eventType', {error: {foo: 12345}});
+    var testError;
+    try {
+        testError = new window.ErrorEvent('eventType', {error: {foo: 12345}});
+    } catch(e){
+        // IE breaks with "Object doesn't support this action"
+        return false;
+    }
 
     if (testError.error && testError.error.foo === 12345 && typeof testError.colno === 'number'){
         return true;
