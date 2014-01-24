@@ -4,25 +4,31 @@ module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
-        'closureCompiler': {
+        clean: {
+            dist: ['dist']
+        },
+        closureCompiler: {
             options: {
                 compilerFile: './closure/compiler.jar',
                 checkModified: true,
                 compilerOpts: {
-                    compilation_level: 'ADVANCED_OPTIMIZATIONS',
+                    compilation_level: 'SIMPLE_OPTIMIZATIONS',
                     warning_level: 'verbose',
                     jscomp_off: ['checkTypes', 'fileoverviewTags'],
-                    summary_detail_level: 3,
-                    output_wrapper: '"(function(){%output%}).call(this);"'
+                    summary_detail_level: 3
                 },
                 execOpts: {
                     maxBuffer: 200 * 1024
                 }
 
             },
-            'compile': {
+            compile: {
                 src: './tracekit.js',
-                dest: './tracekit.min.js'
+                dest: './dist/tracekit.noplugins.min.js'
+            },
+            compileWithPlugins: {
+                src: ['./tracekit.js', './plugins/*.js'],
+                dest: './dist/tracekit.min.js'
             }
         },
         jshint: {
@@ -59,14 +65,28 @@ module.exports = function (grunt) {
                 ActiveXObject: false
             },
             lint: {
-                src: ['grunt.js', 'tracekit.js']
+                src: ['Gruntfile.js', 'tracekit.js', './plugins/*.js']
             }
+        },
+        connect: {
+          test: {
+            options: {
+              port: 9001,
+              open: 'http://localhost:9001/tests/testBuild.html',
+              keepalive: true
+            }
+          }
         }
     });
 
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-closure-tools');
 
-    grunt.registerTask('default', ['jshint:lint', 'closureCompiler:compile']);
-    grunt.registerTask('travis', ['jshint:lint', 'closureCompiler:compile']);
+    grunt.registerTask('default', ['clean', 'jshint:lint', 'closureCompiler']);
+    grunt.registerTask('travis', ['clean', 'jshint:lint', 'closureCompiler']);
+
+    // Launch the recursion test
+    grunt.registerTask('test', ['default', 'connect:test']);
 };

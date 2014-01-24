@@ -5,8 +5,8 @@ If you run this file under IE9, it will make the browser become unresponsive bec
 <!doctype html>
 <html>
 <head>
-<title>TraceKit Recursion Test</title>
-<script src="../tracekit.js"></script>
+<title>TraceKit Build Test</title>
+<script src="../dist/tracekit.noplugins.min.js"></script>
 <link href="mocha.css" rel="stylesheet">
 <script src="mocha.js"></script>
 <script>
@@ -59,7 +59,8 @@ describe('crash', function(){
 </script>
 </head>
 <body>
-<h1>TraceKit Recursion Test</h1>
+<h1>TraceKit Build Test</h1>
+<p>You should see output below and no errors (just logging) in the console. If not, the build has broken.</p>
 <div id="mocha"></div>
 <script>
 mocha.run()

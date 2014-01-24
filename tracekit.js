@@ -58,6 +58,40 @@ TraceKit.wrap = function traceKitWrapper(func) {
 };
 
 /**
+ * TraceKit.supportsExtendedWindowOnError: Returns a boolean indicating
+ * support for the extended window.onerror handler, part of the HTML5 spec as of 
+ * August 2013. (https://mikewest.org/2013/08/debugging-runtime-errors-with-window-onerror)
+ *
+ * Call this function from a plugin to determine if you should wrap a function or not.
+ * If the browser supports extended window.onerror, there is no need to wrap jQuery,
+ * setTimeout, etc. as they will receive decent stacks from window.onerror itself.
+ *
+ * An easy way to test for support is to check for an error & colno attribute
+ * on a created ErrorEvent. See 
+ * https://src.chromium.org/viewvc/blink/trunk/LayoutTests/fast/events/constructors/error-event-constructor.html?r1=155454&r2=155453&pathrev=155454
+ * 
+ * @returns {Boolean} supportedExtendedOnError Support enabled/disabled boolean.
+ */
+TraceKit.supportsExtendedWindowOnError = function supportsExtendedWindowOnError() {
+    if (!window.ErrorEvent){
+        return false;
+    }
+    
+    var testError;
+    try {
+        testError = new window.ErrorEvent('eventType', {error: {foo: 12345}});
+    } catch(e){
+        // IE breaks with "Object doesn't support this action"
+        return false;
+    }
+
+    if (testError.error && testError.error.foo === 12345 && typeof testError.colno === 'number'){
+        return true;
+    }
+    return false;
+};
+
+/**
  * TraceKit.report: cross-browser processing of unhandled exceptions
  *
  * Syntax:
@@ -156,7 +190,7 @@ TraceKit.report = (function reportModuleWrapper() {
      * @param {(number|string)} lineNo The line number at which the error
      * occurred.
      */
-    function traceKitWindowOnError(message, url, lineNo) {
+    function traceKitWindowOnError(message, url, lineNo, colNo, error) {
         var stack = null;
 
         if (lastExceptionStack) {
@@ -164,6 +198,9 @@ TraceKit.report = (function reportModuleWrapper() {
             stack = lastExceptionStack;
             lastExceptionStack = null;
             lastException = null;
+        } else if (error) {
+            // New HTML5 spec (Aug 2013) actually passes an error to window.onerror
+            stack = TraceKit.computeStackTrace(error);
         } else {
             var location = {
                 'url': url,
@@ -1063,35 +1100,6 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
     return computeStackTrace;
 }());
 
-/**
- * Extends support for global error handling for asynchronous browser
- * functions. Adopted from Closure Library's errorhandler.js
- */
-(function extendToAsynchronousCallbacks() {
-    var _helper = function _helper(fnName) {
-        var originalFn = window[fnName];
-        window[fnName] = function traceKitAsyncExtension() {
-            // Make a copy of the arguments
-            var args = _slice.call(arguments);
-            var originalCallback = args[0];
-            if (typeof (originalCallback) === 'function') {
-                args[0] = TraceKit.wrap(originalCallback);
-            }
-            // IE < 9 doesn't support .call/.apply on setInterval/setTimeout, but it
-            // also only supports 2 argument and doesn't care what "this" is, so we
-            // can just call the original function directly.
-            if (originalFn.apply) {
-                return originalFn.apply(this, args);
-            } else {
-                return originalFn(args[0], args[1]);
-            }
-        };
-    };
-
-    _helper('setTimeout');
-    _helper('setInterval');
-}());
-
 //Default options:
 if (!TraceKit.remoteFetching) {
   TraceKit.remoteFetching = true;
@@ -1102,6 +1110,10 @@ if (!TraceKit.collectWindowErrors) {
 if (!TraceKit.linesOfContext || TraceKit.linesOfContext < 1) {
   // 5 lines before, the offending line, 5 lines after
   TraceKit.linesOfContext = 11;
+}
+// Set to true to ignore e.g. plugin warnings
+if (typeof TraceKit.suppressWarnings === 'undefined') {
+  TraceKit.suppressWarnings = false;
 }
 
 

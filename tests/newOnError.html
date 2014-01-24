@@ -1,0 +1,70 @@
+<!--
+A simple test for extended window.onerror support.
+See: https://mikewest.org/2013/08/debugging-runtime-errors-with-window-onerror 
+-->
+<!doctype html>
+<html>
+<head>
+  <title>TraceKit OnError Test</title>
+  <script src="../tracekit.js"></script>
+  <script>
+    setupTraceKit()
+    function setupTraceKit(){
+      function indent(text){
+        return text.split('\n').map(function(line){
+          return '  ' + line
+        }).join('\n')
+      }
+
+      TraceKit.report.subscribe(function(stackInfo){
+        var out = [];
+        out.push(stackInfo.name + ' : ' + stackInfo.message)
+        var stack = stackInfo.stack
+        if (!stack || stack.length === 0) return
+        if (stack[0].context){
+          out.push(indent(stack[0].context.join('\n')))
+        }
+        for (var i = 0; i < stack.length; i++){
+          var line = stack[i]
+          out.push('  at ' + line.func + ' (' + [line.url, line.line, line.column].join(':') + ')')
+        }
+
+        // Append to page
+        var output = document.getElementById('errorOutput');
+        var innerContentWrapper = document.createElement('pre');
+        var innerContent = document.createElement('li');
+        innerContent.innerHTML = escapeHtml(out.join('\n'));
+        innerContentWrapper.appendChild(innerContent);
+        output.appendChild(innerContentWrapper);
+      })
+    }
+    var entityMap = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': '&quot;',
+      "'": '&#39;',
+      "/": '&#x2F;'
+    };
+
+    function escapeHtml(string) {
+      return String(string).replace(/[&<>"'\/]/g, function (s) {
+        return entityMap[s];
+      });
+    }
+    // Throw a delayed error
+    setTimeout(function(){throw new Error('Delayed Error');}, 500);
+
+    // Throw an additional error if extended window.onerror is not supported.
+    TraceKit.supportsExtendedWindowOnError(function(supported) {
+      if (!supported) throw new Error("Extended window.onerror is not supported.");
+    });
+  </script>
+</head>
+<body>
+  <h1>TraceKit OnError Test</h1>
+  <h4>If your browser supports the new onError signature, you should see column numbers on traces
+      and headers starting with 'Error', not 'undefined'.</h4>
+  <div id="errorOutput"></div>
+</body>
+</html>

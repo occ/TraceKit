@@ -16,7 +16,7 @@ bower install tracekit
 ```
 This places TraceKit at `components/tracekit/tracekit.js`. Install [bower](http://twitter.github.com/bower/): `npm install bower -g`, download npm with Node: http://nodejs.org
 
-Then include the `<script>` to your page
+Then include the `<script>` in your page.
 
 ## Usage
 
@@ -73,6 +73,39 @@ TraceKit.collectWindowErrors = false;
 ```
 
 View the source for more details and examples.
+
+## Plugins
+
+Because most browsers support a [very limited window.onerror](https://bugzilla.mozilla.org/show_bug.cgi?id=355430) that
+does not pass an actual stack trace, TraceKit works around this with `TraceKit.wrap`. This is an easy mechanism for
+wrapping async functions. Previous versions of TraceKit wrapped jQuery event handlers and setTimeout/setInterval by default.
+That code is now in the plugins folder and can be used at will.
+
+In most applications, you'll want to include all plugins to ensure full stacktraces for as many errors as possible.
+
+Thankfully, in the newest version of the HTML5 Spec, and as of early September 2013, Chrome Canary [supports an
+extended window.onerror signature](https://code.google.com/p/chromium/issues/detail?id=147127) that passes an actual
+Error object along. In this case, TraceKit has the function `TraceKit.supportsExtendedWindowOnError`, which calls back 
+with a boolean. If true, `window.onerror` has superpowers and wrapping plugins should halt as their functionality
+is no longer needed.
+
+## Building
+
+To get minified versions of source, clone the project, and:
+
+```bash
+npm install
+wget http://closure-compiler.googlecode.com/files/compiler-latest.zip
+unzip compiler-latest.zip -d closure
+grunt
+```
+
+Built files will be stored in /dist.
+
+`tracekit.noplugins.min.js` does not wrap setTimeout/setInterval or jQuery. 
+
+`tracekit.min.js` contains setTimeout/setInterval & jQuery wrapping. If you need one but not the other,
+include the file in /plugins manually.
 
 ![Stacktrace or GTFO](http://i.imgur.com/jacoj.jpg)
 
