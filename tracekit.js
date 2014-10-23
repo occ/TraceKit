@@ -235,8 +235,18 @@ TraceKit.report = (function reportModuleWrapper() {
         throw ex; // re-throw to propagate to the top level (and cause window.onerror)
     }
 
+    /**
+     * Returns whether there are any report handlers.
+     * @return {Boolean} whether there's any handlers
+     */
+    function hasHandlers() {
+        return handlers.length > 0;
+    }
+
+
     report.subscribe = subscribe;
     report.unsubscribe = unsubscribe;
+    report.hasHandlers = hasHandlers;
     return report;
 }());
 
@@ -1074,7 +1084,8 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
             // Make a copy of the arguments
             var args = _slice.call(arguments);
             var originalCallback = args[0];
-            if (typeof (originalCallback) === 'function') {
+            // only wrap if there's a handler for the report
+            if (typeof (originalCallback) === 'function' && TraceKit.report.hasHandlers()) {
                 args[0] = TraceKit.wrap(originalCallback);
             }
             // IE < 9 doesn't support .call/.apply on setInterval/setTimeout, but it
