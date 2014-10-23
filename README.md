@@ -82,6 +82,11 @@ Right now the project is being over-hauled, please jump into #shieldjs on freeno
 
 All code must pass JSHint and tests, run `grunt` for this. New features need accompanying documentation in the README, changes to existing api's need updated documentation. In general, open an issue for whatever it is you're thinking, get some quick feedback, make good stuff, and we'll accept the PR.
 
+Before testing you will need to get the closure compiler jar:
+
+    wget http://dl.google.com/closure-compiler/compiler-latest.zip
+    unzip compiler-latest.zip -d closure 
+
 ## License
 
 (The MIT License)

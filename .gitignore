@@ -1,3 +1,5 @@
 .idea/
+closure
+compiler-latest.zip
 node_modules/
 TraceKit.iml
