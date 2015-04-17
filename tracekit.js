@@ -1059,6 +1059,7 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
     computeStackTrace.guessFunctionName = guessFunctionName;
     computeStackTrace.gatherContext = gatherContext;
     computeStackTrace.ofCaller = computeStackTraceOfCaller;
+    computeStackTrace.getSource = getSource;
 
     return computeStackTrace;
 }());
