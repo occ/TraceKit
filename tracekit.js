@@ -106,7 +106,9 @@ TraceKit.report = (function reportModuleWrapper() {
      * @param {Function} handler
      */
     function subscribe(handler) {
-        installGlobalHandler();
+        if (TraceKit.globalHandling) {
+              installGlobalHandler();
+        }
         handlers.push(handler);
     }
 
@@ -126,11 +128,8 @@ TraceKit.report = (function reportModuleWrapper() {
      * Dispatch stack information to all handlers.
      * @param {Object.<string, *>} stack
      */
-    function notifyHandlers(stack, windowError) {
+    function notifyHandlers(stack) {
         var exception = null;
-        if (windowError && !TraceKit.collectWindowErrors) {
-          return;
-        }
         for (var i in handlers) {
             if (_has(handlers, i)) {
                 try {
@@ -180,7 +179,7 @@ TraceKit.report = (function reportModuleWrapper() {
             };
         }
 
-        notifyHandlers(stack, 'from window.onerror');
+        notifyHandlers(stack);
 
         if (_oldOnerrorHandler) {
             return _oldOnerrorHandler.apply(this, arguments);
@@ -207,7 +206,7 @@ TraceKit.report = (function reportModuleWrapper() {
         var args = _slice.call(arguments, 1);
         if (lastExceptionStack) {
             if (lastException === ex) {
-                return; // already caught by an inner catch block, ignore
+                throw ex; // rethrow.
             } else {
                 var s = lastExceptionStack;
                 lastExceptionStack = null;
@@ -1093,18 +1092,9 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
 }());
 
 //Default options:
-if (!TraceKit.remoteFetching) {
-  TraceKit.remoteFetching = true;
-}
-if (!TraceKit.collectWindowErrors) {
-  TraceKit.collectWindowErrors = true;
-}
-if (!TraceKit.linesOfContext || TraceKit.linesOfContext < 1) {
-  // 5 lines before, the offending line, 5 lines after
-  TraceKit.linesOfContext = 11;
-}
-
-
+TraceKit.globalHandling = true;
+TraceKit.remoteFetching = true;
+TraceKit.linesOfContext = 11;
 
 // Export to global object
 window.TraceKit = TraceKit;
