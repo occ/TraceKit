@@ -180,10 +180,17 @@ TraceKit.report = (function reportModuleWrapper() {
             };
         }
 
-        notifyHandlers(stack, 'from window.onerror');
-
         if (_oldOnerrorHandler) {
-            return _oldOnerrorHandler.apply(this, arguments);
+            var _oldOnerrorReturn = _oldOnerrorHandler.apply(this, arguments);
+            
+            // if there is a return value and that return value has notifyTraceKitHandlers set to false, don't notifyHandlers.
+            if (_oldOnerrorReturn && _oldOnerrorReturn.notifyTraceKitHandlers === false) {
+            } else { // else, always always notifyHandlers
+                notifyHandlers(stack, 'from window.onerror');
+            }
+            return _oldOnerrorReturn; // preserve any potential return behavior of the old onerror function.
+        } else {
+            notifyHandlers(stack, 'from window.onerror');
         }
 
         return false;
