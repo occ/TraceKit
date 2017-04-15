@@ -156,10 +156,12 @@ TraceKit.report = (function reportModuleWrapper() {
      * @param {(number|string)} lineNo The line number at which the error
      * occurred.
      */
-    function traceKitWindowOnError(message, url, lineNo) {
+    function traceKitWindowOnError(message, url, lineNo, column, ex) {
         var stack = null;
 
-        if (lastExceptionStack) {
+         if (ex) {
+            stack = TraceKit.computeStackTrace(ex);
+        } else if (lastExceptionStack) {
             TraceKit.computeStackTrace.augmentStackTraceWithInitialElement(lastExceptionStack, url, lineNo, message);
             stack = lastExceptionStack;
             lastExceptionStack = null;
